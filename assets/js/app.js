@@ -8,7 +8,7 @@ var giphyapp = {
     searchUrl : "https://api.giphy.com/v1/gifs/search?q=",
     api_key : "api_key=dc6zaTOxFJmzC&limit=10",
     refreshButtons : function() {
-        console.log("refreshing");
+
         // clear buttons.
         $("#buttons-animals-here").empty();
         // add button from list
@@ -56,6 +56,7 @@ $(document).on("click",".button-animal",function(event){
     }).then( function(res) {
         
         var r = res.data;
+
         // clean it up
         for ( var i = 0; i < r.length; i++) {
             $("#animal-"+(i+1)).empty();
@@ -66,15 +67,34 @@ $(document).on("click",".button-animal",function(event){
             var gifAnimals = $("<div>");
             var rating = r[i].rating;
             var p = $("<p>").text("Rating: " + rating);
-            var gif = $('<img src="'+ r[i].images.fixed_width.url+'">');
-            gifAnimals.append(p);
+            var stillGif = r[i].images.fixed_height_still.url;
+            var animateGif = r[i].images.fixed_width.url;
+            var gif = $('<img src="'+ stillGif+
+            '" data-still="'+stillGif+
+            '" data-animate="'+animateGif+
+            '" data-state="still" class="gifAnimal">');
             gifAnimals.append(gif);
+            gifAnimals.append(p);
             $("#animal-"+(i+1)).append(gifAnimals);
         }
     });
 
 
 });
+
+// change data state , toggle
+$(document).on("click",".gifAnimal",function(event){
+
+    var state = $(this).attr("data-state");
+    if (state === "still") {
+        $(this).attr("src", $(this).attr("data-animate"));
+        $(this).attr("data-state", "animate");
+      } else {
+        $(this).attr("src", $(this).attr("data-still"));
+        $(this).attr("data-state", "still");
+      }
+});
+
 
 });
 
