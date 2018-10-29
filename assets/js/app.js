@@ -5,18 +5,16 @@ $(document).ready(function() {
 
 var giphyapp = {
     animal : [],
-    url : "https://api.giphy.com/v1/gifs/search/?api_key=dc6zaTOxFJmzC&limit=10&q=",
+    searchUrl : "https://api.giphy.com/v1/gifs/search?q=",
+    api_key : "api_key=dc6zaTOxFJmzC&limit=10",
     refreshButtons : function() {
         console.log("refreshing");
         // clear buttons.
         $("#buttons-animals-here").empty();
         // add button from list
         for( var i = 0; i < this.animal.length; i++) {
-
-            var animalBtn = $("<button>");
-            animalBtn.addClass("btn btn-info button-animal");
-            animalBtn.attr("data-btn-name",this.animal[i].toLowerCase());
-            animalBtn.text(this.animal[i]);
+            var animalBtn = $('<button class = "button-animal btn btn-info" data-btn-name = "'+
+            this.animal[i].toLowerCase()+'">'+this.animal[i]+"</button>");
             $("#buttons-animals-here").append(animalBtn);
         }
     }
@@ -51,13 +49,35 @@ $("#form-animal-submit").click(function(event){
 });
 
 /**
- * listener on animal button
+ * listener on dynamic animal buttons
  */
-$(".button-animal").click(function(event){
-    event.preventDefault();    
+$(document).on("click",".button-animal",function(event){
     
-        console.log("clicked");
-        //console.log($(this).attr("data-button-name"));
+    console.log($(this).attr("data-btn-name"));
+
+    $.ajax({
+        url : giphyapp.searchUrl + $(this).attr("data-btn-name") +  "&"+ giphyapp.api_key,
+        method : "GET"
+    }).then( function(res) {
+        
+        var r = res.data;
+        // clean it up
+        if ( r.length > 0 ) {
+            $("#gifs-animals-here").empty();
+        }
+
+        // populate with gifs
+        for ( var i = 0; i < r.length; i++ ) {
+            var gifAnimals = $("<div>");
+            var rating = r[i].rating;
+            var p = $("<p>").text("Rating: " + rating);
+            var gif = $('<img src="'+ r[i].images.fixed_width.url+'">');
+            gifAnimals.append(p);
+            gifAnimals.append(gif);
+            $("#gifs-animals-here").append(gifAnimals);
+        }
+
+    });
 
 
 });
