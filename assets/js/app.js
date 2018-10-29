@@ -35,13 +35,10 @@ $("#form-animal-submit").click(function(event){
             isThere = true;
         }
     }
-    if ( !isThere ) {
+    if ( !isThere && input.length > 0) {
         giphyapp.animal.unshift($("#form-animal-name").val().trim());
+        giphyapp.refreshButtons();
     }
-
-    console.log(giphyapp.animal);
-    giphyapp.refreshButtons();
-
 
     // clear the input
     $("#form-animal-name").val("");
@@ -53,8 +50,6 @@ $("#form-animal-submit").click(function(event){
  */
 $(document).on("click",".button-animal",function(event){
     
-    console.log($(this).attr("data-btn-name"));
-
     $.ajax({
         url : giphyapp.searchUrl + $(this).attr("data-btn-name") +  "&"+ giphyapp.api_key,
         method : "GET"
@@ -62,8 +57,8 @@ $(document).on("click",".button-animal",function(event){
         
         var r = res.data;
         // clean it up
-        if ( r.length > 0 ) {
-            $("#gifs-animals-here").empty();
+        for ( var i = 0; i < r.length; i++) {
+            $("#animal-"+(i+1)).empty();
         }
 
         // populate with gifs
@@ -74,9 +69,8 @@ $(document).on("click",".button-animal",function(event){
             var gif = $('<img src="'+ r[i].images.fixed_width.url+'">');
             gifAnimals.append(p);
             gifAnimals.append(gif);
-            $("#gifs-animals-here").append(gifAnimals);
+            $("#animal-"+(i+1)).append(gifAnimals);
         }
-
     });
 
 
